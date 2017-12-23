@@ -9,22 +9,6 @@ import java.util.List;
  */
 
 public final class CourseInfo implements Parcelable{
-    private final String mCourseId;
-    private final String mTitle;
-    private final List<ModuleInfo> mModules;
-
-    private CourseInfo(String courseId, String title, List<ModuleInfo> modules) {
-        mCourseId = courseId;
-        mTitle = title;
-        mModules = modules;
-    }
-
-    protected CourseInfo(Parcel in) {
-        mCourseId = in.readString();
-        mTitle = in.readString();
-        mModules = null;
-    }
-
     public static final Creator<CourseInfo> CREATOR = new Creator<CourseInfo>() {
         @Override
         public CourseInfo createFromParcel(Parcel in) {
@@ -36,6 +20,21 @@ public final class CourseInfo implements Parcelable{
             return new CourseInfo[size];
         }
     };
+    private final String mCourseId;
+    private final String mTitle;
+    private final List<ModuleInfo> mModules;
+
+    protected CourseInfo(String courseId, String title, List<ModuleInfo> modules) {
+        mCourseId = courseId;
+        mTitle = title;
+        mModules = modules;
+    }
+
+    protected CourseInfo(Parcel in) {
+        mCourseId = in.readString();
+        mTitle = in.readString();
+        mModules = in.readParcelable(ModuleInfo.class.getClassLoader());
+    }
 
     public String getCourseId() {
         return mCourseId;

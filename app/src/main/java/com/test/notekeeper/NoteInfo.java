@@ -8,6 +8,18 @@ import android.os.Parcelable;
  */
 
 public final class NoteInfo implements Parcelable {
+    public final static Parcelable.Creator<NoteInfo> CREATOR = new Parcelable.Creator<NoteInfo>() {
+
+        @Override
+        public NoteInfo createFromParcel(Parcel source) {
+            return new NoteInfo(source);
+        }
+
+        @Override
+        public NoteInfo[] newArray(int size) {
+            return new NoteInfo[size];
+        }
+    };
     private CourseInfo mCourse;
     private String mTitle;
     private String mText;
@@ -19,9 +31,10 @@ public final class NoteInfo implements Parcelable {
     }
 
     private NoteInfo(Parcel source) {
-        mCourse = source.readParcelable(CourseInfo.class.getClassLoader());
+
         mTitle = source.readString();
         mText = source.readString();
+        mCourse = source.readParcelable(CourseInfo.class.getClassLoader());
     }
 
     public CourseInfo getCourse() {
@@ -40,6 +53,7 @@ public final class NoteInfo implements Parcelable {
         mTitle = title;
     }
 
+    @org.jetbrains.annotations.Contract(pure = true)
     public String getText() {
         return mText;
     }
@@ -84,16 +98,4 @@ public final class NoteInfo implements Parcelable {
         dest.writeParcelable(mCourse,0);
 
     }
-    public final static Parcelable.Creator<NoteInfo> CREATOR = new Parcelable.Creator<NoteInfo>() {
-
-        @Override
-        public NoteInfo createFromParcel(Parcel source) {
-            return new NoteInfo(source);
-        }
-
-        @Override
-        public NoteInfo[] newArray(int size) {
-            return new NoteInfo[size];
-        }
-    };
 }
