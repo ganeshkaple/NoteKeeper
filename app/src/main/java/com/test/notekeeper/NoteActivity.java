@@ -15,6 +15,11 @@ import java.util.List;
 public class NoteActivity extends AppCompatActivity {
 
     public static final String NOTE_POSITION = "com.test.notekeeper.NOTE_POSITION";
+    public static final String ORIGINAL_NOTE_COURSE_ID = "com.test.notekeeper.ORIGINAL_COURSE_ID";
+    public static final String ORIGINAL_NOTE_TITLE = "com.test.notekeeper.ORIGINAL_NOTE_TITLE";
+    public static final String ORIGINAL_NOTE_TEXT = "com.test.notekeeper.ORIGINAL_NOTE_TEXT";
+
+
     public static final int POSTION_NOT_SET = -1;
     private NoteInfo note;
     private boolean isNewNote;
@@ -35,21 +40,41 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         spinnerCourses = findViewById(R.id.spinner_courses);
+        textNoteText = findViewById(R.id.text_note_text);
+        textNoteTitle = findViewById(R.id.text_note_title);
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         ArrayAdapter<CourseInfo> adapter = new ArrayAdapter<CourseInfo>(this, android.R.layout.simple_spinner_item,courses);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCourses.setAdapter(adapter);
 
         readDisplayStateValues();
-        saveOriginalStateValues();
+        if (savedInstanceState == null)
+            saveOriginalNoteValues();
+        else restoreOriginalNoteValues(savedInstanceState);
+
         if (!isNewNote) displayNotes(spinnerCourses, textNoteTitle, textNoteText);
     }
 
-    private void saveOriginalStateValues() {
+    private void restoreOriginalNoteValues(Bundle savedInstanceState) {
+        originalNoteCourseId = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_ID);
+        originalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
+        originalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_TITLE);
+    }
+
+    private void saveOriginalNoteValues() {
         if (isNewNote) return;
         originalNoteCourseId = note.getCourse().getCourseId();
         originalNoteTitle = note.getTitle();
         originalNoteText = note.getText();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ORIGINAL_NOTE_COURSE_ID, originalNoteCourseId);
+        outState.putString(ORIGINAL_NOTE_TITLE, originalNoteText);
+        outState.putString(ORIGINAL_NOTE_TITLE, originalNoteTitle);
+
     }
 
     private void displayNotes(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
