@@ -69,4 +69,20 @@ public class DataManagerTest {
 
 
     }
+
+    @Test
+    public void createNewNoteOneStepCreation() {
+
+        final CourseInfo course = dataManager.getCourse("android_async");
+        final String noteTitle = "test note title";
+        final String noteText = "test note text";
+
+        int index = dataManager.createNewNote(course, noteTitle, noteText);
+
+        NoteInfo compareInfo = dataManager.getNotes().get(index);
+        //assertSame(noteInfo, compareInfo);
+        assertEquals(course, compareInfo.getCourse());
+        assertEquals(noteText, compareInfo.getText());
+        assertEquals(noteTitle, compareInfo.getTitle());
+    }
 }

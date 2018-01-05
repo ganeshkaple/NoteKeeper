@@ -13,6 +13,9 @@ public class DataManager {
     private List<CourseInfo> mCourses = new ArrayList<>();
     private List<NoteInfo> mNotes = new ArrayList<>();
 
+    private DataManager() {
+    }
+
     public static DataManager getInstance() {
         if(ourInstance == null) {
             ourInstance = new DataManager();
@@ -81,9 +84,6 @@ public class DataManager {
                 count++;
         }
         return count;
-    }
-
-    private DataManager() {
     }
 
     //region Initialization code
@@ -192,6 +192,18 @@ public class DataManager {
         modules.add(new ModuleInfo("java_core_m10", "Persisting Objects with Serialization"));
 
         return new CourseInfo("java_core", "Java Fundamentals: The Core Platform", modules);
+    }
+
+    public int createNewNote(CourseInfo course, String noteTitle, String noteText) {
+        int index = createNewNote();
+        NoteInfo noteInfo1 = getNotes().get(index);
+        noteInfo1.setCourse(course);
+        noteInfo1.setText(noteText);
+        noteInfo1.setTitle(noteTitle);
+
+
+        return index;
+
     }
     //endregion
 
