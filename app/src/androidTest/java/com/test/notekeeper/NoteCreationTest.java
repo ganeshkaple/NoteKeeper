@@ -14,10 +14,15 @@ import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Ganesh Kaple
@@ -31,6 +36,8 @@ public class NoteCreationTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
+
+
         dataManager = DataManager.getInstance();
     }
 
@@ -44,12 +51,20 @@ public class NoteCreationTest {
 
         onView(withId(R.id.spinner_courses)).perform(click());
         onData(allOf(instanceOf(CourseInfo.class), equalTo(course))).perform(click());
+        onView(withId(R.id.spinner_courses)).check(matches(withSpinnerText(containsString(course.getTitle()))));
 
-        onView(withId(R.id.text_note_title)).perform(typeText(noteTitle));
-        onView(withId(R.id.text_note_text)).perform(typeText(noteText));
-        closeSoftKeyboard();
+
+        onView(withId(R.id.text_note_title)).perform(typeText(noteTitle)).check(matches(withText(containsString(noteTitle))));
+        onView(withId(R.id.text_note_text)).perform(typeText(noteText), closeSoftKeyboard());
+        onView(withId(R.id.text_note_text)).check(matches(withText(containsString(noteText))));
 
         pressBack();
+
+        int index = dataManager.getNotes().size() - 1;
+        NoteInfo note = dataManager.getNotes().get(index);
+        assertEquals(course, note.getCourse());
+        assertEquals(noteTitle, note.getTitle());
+        assertEquals(noteText, note.getText());
 
     }
 }
