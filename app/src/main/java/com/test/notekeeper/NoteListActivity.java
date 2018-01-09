@@ -4,24 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
-import java.util.List;
-
-import static com.test.notekeeper.NoteActivity.NOTE_POSITION;
 
 public class NoteListActivity extends AppCompatActivity {
+    private NoteRecyclerAdapter adapter;
 
-    private ArrayAdapter<NoteInfo> adapter;
+    //private ArrayAdapter<NoteInfo> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note_list);
+        setContentView(R.layout.content_note_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton floatingActionButton = findViewById(R.id.fab);
@@ -38,11 +34,11 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
+ //       adapter.notifyDataSetChanged();
     }
 
     private void initializeDisplayContent() {
-        final ListView listView = findViewById(R.id.list_note);
+      /*  final ListView listView = findViewById(R.id.list_notes);
         final List<NoteInfo> notes = DataManager.getInstance().getNotes();
 
         adapter = new ArrayAdapter<NoteInfo>(this, android.R.layout.simple_list_item_1, notes);
@@ -55,6 +51,13 @@ public class NoteListActivity extends AppCompatActivity {
                 intent.putExtra(NOTE_POSITION, position);
                 startActivity(intent);
             }
-        });
+        });*/
+      final RecyclerView recyclerView = findViewById(R.id.list_notes);
+      final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+      recyclerView.setLayoutManager(linearLayoutManager);
+        adapter = new NoteRecyclerAdapter(this, DataManager.getInstance().getNotes());
+      recyclerView.setAdapter(adapter);
+
+
     }
 }
