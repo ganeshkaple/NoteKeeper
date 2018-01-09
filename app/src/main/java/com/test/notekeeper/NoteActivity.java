@@ -126,9 +126,18 @@ public class NoteActivity extends AppCompatActivity {
         } else if (id == R.id.action_cancel) {
             isCancelling = true;
             finish();
-        }
+        } else if (id == R.id.action_next) ;
+        moveNext();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void moveNext() {
+        saveNote();
+        ++notePosition;
+        note = DataManager.getInstance().getNotes().get(notePosition);
+        displayNotes(spinnerCourses, textNoteTitle, textNoteText);
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -158,6 +167,14 @@ public class NoteActivity extends AppCompatActivity {
         note.setCourse((CourseInfo) spinnerCourses.getSelectedItem());
         note.setText(textNoteText.getText().toString());
         note.setTitle(textNoteTitle.getText().toString());
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_next);
+        int lastNoteIndex = DataManager.getInstance().getNotes().size() - 1;
+        item.setEnabled(notePosition < lastNoteIndex);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     private void sendEmail() {
