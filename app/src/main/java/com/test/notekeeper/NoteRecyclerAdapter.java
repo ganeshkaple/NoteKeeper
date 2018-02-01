@@ -57,7 +57,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         public ViewHolder(View itemView) {
             super(itemView);
             textCourse = itemView.findViewById(R.id.text_tiitle);
-            textViewText = itemView.findViewById(R.id.text_note_text);
+            textViewText = itemView.findViewById(R.id.text_view_text);
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, NoteActivity.class);
                 intent.putExtra(NoteActivity.NOTE_POSITION, currentPosition);
