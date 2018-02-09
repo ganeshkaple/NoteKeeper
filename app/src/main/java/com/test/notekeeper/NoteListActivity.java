@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 public class NoteListActivity extends AppCompatActivity {
     private NoteRecyclerAdapter adapter;
@@ -21,12 +20,9 @@ public class NoteListActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton floatingActionButton = findViewById(R.id.fab);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
-                startActivity(intent);
-            }
+        floatingActionButton.setOnClickListener(v -> {
+            Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
+            startActivity(intent);
         });
         initializeDisplayContent();
     }
