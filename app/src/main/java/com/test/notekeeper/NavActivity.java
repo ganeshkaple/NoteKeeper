@@ -9,6 +9,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,9 +17,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.List;
+
 public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private NoteRecyclerAdapter adapter;
+    private NoteRecyclerAdapter noteRecyclerAdapter;
+    private LinearLayoutManager linearLayoutManager;
+    private RecyclerView recyclerView;
+    private NavigationView navigationView;
+    private CoursesRecyclerAdapter coursesRecyclerAdapter;
+    private List<CourseInfo> courses;
+    private GridLayoutManager gridLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +48,7 @@ public class NavActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         initializeDisplayContent();
@@ -84,10 +93,10 @@ public class NavActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_notes) {
-            handleSelection("Notes");
+            displayNotes();
             // Handle the camera action
         } else if (id == R.id.nav_courses) {
-            handleSelection("Courses");
+            displayCourses();
 
         } else if (id == R.id.nav_share) {
             handleSelection("Dude, Stop sharing everything");
@@ -111,15 +120,15 @@ public class NavActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
+        noteRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void initializeDisplayContent() {
       /*  final ListView listView = findViewById(R.id.list_notes);
         final List<NoteInfo> notes = DataManager.getInstance().getNotes();
 
-        adapter = new ArrayAdapter<NoteInfo>(this, android.R.layout.simple_list_item_1, notes);
-        listView.setAdapter(adapter);
+        noteRecyclerAdapter = new ArrayAdapter<NoteInfo>(this, android.R.layout.simple_list_item_1, notes);
+        listView.setAdapter(noteRecyclerAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -129,13 +138,37 @@ public class NavActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });*/
-        final RecyclerView recyclerView = findViewById(R.id.list_items);
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView = findViewById(R.id.list_items);
+        linearLayoutManager = new LinearLayoutManager(this);
+        gridLayoutManager = new GridLayoutManager(this, 2);
+        List<CourseInfo> courses = DataManager.getInstance().getCourses();
+        coursesRecyclerAdapter = new CoursesRecyclerAdapter(this, courses);
+        noteRecyclerAdapter = new NoteRecyclerAdapter(this, DataManager.getInstance().getNotes());
+        displayNotes();
+       /* displayCourses();*/
+
+
+    }
+
+    private void displayCourses() {
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setAdapter(coursesRecyclerAdapter);
+        selectNavigationMenuItem(R.id.nav_courses);
+    }
+
+    private void displayNotes() {
+
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new NoteRecyclerAdapter(this, DataManager.getInstance().getNotes());
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(noteRecyclerAdapter);
 
 
+        selectNavigationMenuItem(R.id.nav_notes);
+
+    }
+
+    private void selectNavigationMenuItem(int nav_notes) {
+        Menu menu = navigationView.getMenu();
+        menu.findItem(nav_notes).setChecked(true);
     }
 
 

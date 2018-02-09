@@ -1,7 +1,7 @@
 package com.test.notekeeper;
 
 import android.content.Context;
-import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,21 +15,22 @@ import java.util.List;
  * @since 09-01-2018
  */
 
-public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder> {
+public class CoursesRecyclerAdapter extends RecyclerView.Adapter<CoursesRecyclerAdapter.ViewHolder> {
 
     private final Context context;
     private final LayoutInflater inflater;
-    private final List<NoteInfo> noteInfos;
-    public NoteRecyclerAdapter(Context context, List<NoteInfo> noteInfos) {
+    private final List<CourseInfo> courses;
+
+    public CoursesRecyclerAdapter(Context context, List<CourseInfo> noteInfos) {
         this.context = context;
         inflater = LayoutInflater.from(context);
 
-        this.noteInfos = noteInfos;
+        this.courses = noteInfos;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = inflater.inflate(R.layout.item_note_list,parent,false);
+        View itemView = inflater.inflate(R.layout.item_course_list, parent, false);
 
 
         return new ViewHolder(itemView);
@@ -37,32 +38,32 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        NoteInfo noteInfo= noteInfos.get(position);
+        CourseInfo course = courses.get(position);
         holder.currentPosition = position;
-        holder.textCourse.setText(noteInfo.getCourse().getTitle());
-        holder.textViewText.setText(noteInfo.getTitle());
+        holder.textCourse.setText(course.getTitle());
+        // holder.textViewText.setText(course.getTitle());
     }
 
     @Override
     public int getItemCount() {
-        return noteInfos.size();
+        return courses.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public final TextView textViewText;
+
         public final TextView textCourse;
-        public  int currentPosition;
+        public int currentPosition;
 
         public ViewHolder(View itemView) {
             super(itemView);
             textCourse = itemView.findViewById(R.id.text_tiitle);
-            textViewText = itemView.findViewById(R.id.text_view_text);
-            itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(context, NoteActivity.class);
-                intent.putExtra(NoteActivity.NOTE_POSITION, currentPosition);
-                context.startActivity(intent);
 
+            itemView.setOnClickListener(v -> {
+               /* Intent intent = new Intent(context, NoteActivity.class);
+                intent.putExtra(NoteActivity.NOTE_POSITION, currentPosition);
+                context.startActivity(intent);*/
+                Snackbar.make(v, courses.get(currentPosition).getTitle(), Snackbar.LENGTH_LONG).show();
             });
         }
     }
