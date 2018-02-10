@@ -140,7 +140,7 @@ public class NavActivity extends AppCompatActivity
         });*/
         recyclerView = findViewById(R.id.list_items);
         linearLayoutManager = new LinearLayoutManager(this);
-        gridLayoutManager = new GridLayoutManager(this, 2);
+        gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.course_grid_span));
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         coursesRecyclerAdapter = new CoursesRecyclerAdapter(this, courses);
         noteRecyclerAdapter = new NoteRecyclerAdapter(this, DataManager.getInstance().getNotes());
