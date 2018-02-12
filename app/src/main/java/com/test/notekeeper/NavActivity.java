@@ -1,7 +1,10 @@
 package com.test.notekeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -16,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -50,8 +54,24 @@ public class NavActivity extends AppCompatActivity
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
+        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
         initializeDisplayContent();
+        updateNavHeader();
+    }
+
+    private void updateNavHeader() {
+        View headerView= navigationView.getHeaderView(0);
+        TextView userName = findViewById(R.id.name);
+        TextView email = findViewById(R.id.email);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this  );
+        String userNameAS = preferences.getString("user_display_name", "");
+        String emailId = preferences.getString("user_email","");
+        userName.setText(userNameAS);
+        email.setText(emailId);
+
     }
 
     @Override
@@ -80,6 +100,7 @@ public class NavActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new  Intent(this,SettingsActivity.class));
             return true;
         }
 
@@ -99,7 +120,8 @@ public class NavActivity extends AppCompatActivity
             displayCourses();
 
         } else if (id == R.id.nav_share) {
-            handleSelection("Dude, Stop sharing everything");
+            /*handleSelection("Dude, Stop sharing everything");*/
+            handleShare();
 
         } else if (id == R.id.nav_send) {
             handleSelection("Send");
@@ -109,6 +131,12 @@ public class NavActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void handleShare() {
+        View v = findViewById(R.id.list_items);
+        Snackbar.make(v,"share to " + PreferenceManager.getDefaultSharedPreferences(this).getString("user_favorier_social",""),
+                BaseTransientBottomBar.LENGTH_LONG).show();
     }
 
     private void handleSelection(String msg) {
