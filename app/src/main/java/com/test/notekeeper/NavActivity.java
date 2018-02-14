@@ -1,6 +1,9 @@
 package com.test.notekeeper;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,8 +13,6 @@ import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,7 +32,7 @@ import com.test.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 import java.util.List;
 
 public class NavActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
     public static final int LOADER_NOTES = 0;
     private NoteRecyclerAdapter noteRecyclerAdapter;
     private LinearLayoutManager linearLayoutManager;
@@ -105,8 +106,8 @@ public class NavActivity extends AppCompatActivity
 
     private void updateNavHeader() {
         View headerView= navigationView.getHeaderView(0);
-        TextView userName = findViewById(R.id.name);
-        TextView email = findViewById(R.id.email);
+        TextView userName = headerView.findViewById(R.id.name);
+        TextView email = headerView.findViewById(R.id.email);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this  );
         String userNameAS = preferences.getString("user_display_name", "");
         String emailId = preferences.getString("user_email","");
@@ -208,7 +209,7 @@ public class NavActivity extends AppCompatActivity
         gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.course_grid_span));
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         coursesRecyclerAdapter = new CoursesRecyclerAdapter(this, courses);
-        noteRecyclerAdapter = new NoteRecyclerAdapter(this, DataManager.getInstance().getNotes());
+        noteRecyclerAdapter = new NoteRecyclerAdapter(this, null);
         displayNotes();
        /* displayCourses();*/
 
@@ -237,7 +238,7 @@ public class NavActivity extends AppCompatActivity
 
 
     @Override
-    public android.support.v4.content.Loader onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;
         if (id == LOADER_NOTES) {
             loader = new CursorLoader(this) {
@@ -266,19 +267,18 @@ public class NavActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader loader, Object data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader.getId() == LOADER_NOTES) {
             noteRecyclerAdapter.changeCursor(data);
         }
     }
 
     @Override
-    public void onLoaderReset(android.support.v4.content.Loader loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         if (loader.getId() == LOADER_NOTES) {
             noteRecyclerAdapter.changeCursor(null);
         }
     }
-
 
 
 }

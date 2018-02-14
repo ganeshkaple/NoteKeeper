@@ -301,7 +301,7 @@ public class NoteActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_send_mail) {
+        if (id == R.id.action_send_email) {
             sendEmail();
             return true;
         } else if (id == R.id.action_cancel) {

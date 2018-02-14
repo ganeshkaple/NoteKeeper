@@ -1,5 +1,11 @@
 package com.test.notekeeper;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.test.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
+import com.test.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +106,7 @@ public class DataManager {
     }
 
     public int createNewNote() {
-        NoteInfo note = new NoteInfo(null, null, null);
+        NoteInfo note = new NoteInfo(0, null, null, null);
         mNotes.add(note);
         return mNotes.size() - 1;
     }
