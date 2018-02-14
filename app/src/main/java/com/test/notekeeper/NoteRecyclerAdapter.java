@@ -2,13 +2,12 @@ package com.test.notekeeper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.List;
 
 /**
  * @author Ganesh Kaple
@@ -17,19 +16,41 @@ import java.util.List;
 
 public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder> {
 
-    private final Context context;
-    private final LayoutInflater inflater;
-    private final List<NoteInfo> noteInfos;
-    public NoteRecyclerAdapter(Context context, List<NoteInfo> noteInfos) {
-        this.context = context;
-        inflater = LayoutInflater.from(context);
+    private final Context mContext;
+    private final LayoutInflater mLayoutInflater;
+    private Cursor mCursor;
+    private int mCoursePos;
+    private int mNoteTitlePos;
+    private int mIdPos;
 
-        this.noteInfos = noteInfos;
+    public NoteRecyclerAdapter(Context context, Cursor cursor) {
+        mContext = context;
+        mCursor = cursor;
+        mLayoutInflater = LayoutInflater.from(mContext);
+        populateColumnPositions();
     }
 
+    private void populateColumnPositions() {
+        if (mCursor == null)
+            return;
+
+        // TODO get column indexes from mCursor
+        mCoursePos = mCursor.getColumnIndex(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE);
+        mNoteTitlePos = mCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE);
+        mIdPos = mCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry._ID);
+    }
+
+    public void changeCursor(Cursor cursor) {
+        if (mCursor != null)
+            mCursor.close();
+
+        mCursor = cursor;
+        populateColumnPositions();
+        notifyDataSetChanged();
+    }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = inflater.inflate(R.layout.item_note_list,parent,false);
+        View itemView = mLayoutInflater.inflate(R.layout.item_note_list, parent, false);
 
 
         return new ViewHolder(itemView);
@@ -37,32 +58,39 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        NoteInfo noteInfo= noteInfos.get(position);
-        holder.currentPosition = position;
-        holder.textCourse.setText(noteInfo.getCourse().getTitle());
-        holder.textViewText.setText(noteInfo.getTitle());
+        mCursor.moveToPosition(position);
+        String course = mCursor.getString(mCoursePos);
+        String noteTitle = mCursor.getString(mNoteTitlePos);
+        int id = mCursor.getInt(mIdPos);
+
+        holder.mTextCourse.setText(course);
+        holder.mTextTitle.setText(noteTitle);
+        holder.mId = id;
     }
 
     @Override
     public int getItemCount() {
-        return noteInfos.size();
+        return mCursor == null ? 0 : mCursor.getCount();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        public final TextView textViewText;
-        public final TextView textCourse;
-        public  int currentPosition;
+        public final TextView mTextCourse;
+        public final TextView mTextTitle;
+        public int mId;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textCourse = itemView.findViewById(R.id.text_tiitle);
-            textViewText = itemView.findViewById(R.id.text_view_text);
-            itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(context, NoteActivity.class);
-                intent.putExtra(NoteActivity.NOTE_POSITION, currentPosition);
-                context.startActivity(intent);
+            mTextCourse = itemView.findViewById(R.id.text_tiitle);
+            mTextTitle = itemView.findViewById(R.id.text_view_text);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, NoteActivity.class);
+                    intent.putExtra(NoteActivity.NOTE_ID, mId);
+                    mContext.startActivity(intent);
+                }
             });
         }
     }

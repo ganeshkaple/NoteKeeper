@@ -21,7 +21,7 @@ public class DataManagerTest {
     @Before
     public void setUp() throws Exception {
         dataManager.getNotes().clear();
-        dataManager.initializeExampleNotes();
+        //       dataManager.initializeExampleNotes();
     }
     @Test
     public void createNewNote() throws Exception {
