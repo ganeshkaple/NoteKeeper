@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".NoteActivity"
+            android:exported="true"
             android:label="@string/title_activity_two"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

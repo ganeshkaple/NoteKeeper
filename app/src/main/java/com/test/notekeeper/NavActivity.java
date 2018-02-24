@@ -26,8 +26,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.test.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import com.test.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
+import com.test.notekeeper.NoteKeeperProviderContract.Courses;
+import com.test.notekeeper.NoteKeeperProviderContract.Notes;
 
 import java.util.List;
 
@@ -42,12 +43,6 @@ public class NavActivity extends AppCompatActivity
     private List<CourseInfo> courses;
     private GridLayoutManager gridLayoutManager;
     private NoteKeeperOpenHelper mDbOpenHelper;
-
-    @Override
-    protected void onDestroy() {
-        mDbOpenHelper.close();
-        super.onDestroy();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +81,51 @@ public class NavActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        getLoaderManager().restartLoader(LOADER_NOTES, null, this);
-        updateNavHeader();
+    protected void onDestroy() {
+        mDbOpenHelper.close();
+        super.onDestroy();
+    }
+
+    private void initializeDisplayContent() {
+      /*  final ListView listView = findViewById(R.id.list_notes);
+        final List<NoteInfo> notes = DataManager.getInstance().getNotes();
+
+        noteRecyclerAdapter = new ArrayAdapter<NoteInfo>(this, android.R.layout.simple_list_item_1, notes);
+        listView.setAdapter(noteRecyclerAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
+                //    NoteInfo note = (NoteInfo) listView.getItemAtPosition(position);
+                intent.putExtra(NOTE_POSITION, position);
+                startActivity(intent);
+            }
+        });*/
+        DataManager.loadFromDatabase(mDbOpenHelper);
+        recyclerView = findViewById(R.id.list_items);
+        linearLayoutManager = new LinearLayoutManager(this);
+        gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.course_grid_span));
+        List<CourseInfo> courses = DataManager.getInstance().getCourses();
+        coursesRecyclerAdapter = new CoursesRecyclerAdapter(this, courses);
+        noteRecyclerAdapter = new NoteRecyclerAdapter(this, null);
+        displayNotes();
+       /* displayCourses();*/
+
+    }
+
+    private void displayNotes() {
+
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(noteRecyclerAdapter);
+
+
+        selectNavigationMenuItem(R.id.nav_notes);
+
+    }
+
+    private void selectNavigationMenuItem(int nav_notes) {
+        Menu menu = navigationView.getMenu();
+        menu.findItem(nav_notes).setChecked(true);
     }
 
     private void loadNotes() {
@@ -104,6 +140,23 @@ public class NavActivity extends AppCompatActivity
         noteRecyclerAdapter.changeCursor(notesCursor);
     }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(LOADER_NOTES, null, this);
+        updateNavHeader();
+    }
+
     private void updateNavHeader() {
         View headerView= navigationView.getHeaderView(0);
         TextView userName = headerView.findViewById(R.id.name);
@@ -114,16 +167,6 @@ public class NavActivity extends AppCompatActivity
         userName.setText(userNameAS);
         email.setText(emailId);
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -187,82 +230,32 @@ public class NavActivity extends AppCompatActivity
 
     }
 
-
-    private void initializeDisplayContent() {
-      /*  final ListView listView = findViewById(R.id.list_notes);
-        final List<NoteInfo> notes = DataManager.getInstance().getNotes();
-
-        noteRecyclerAdapter = new ArrayAdapter<NoteInfo>(this, android.R.layout.simple_list_item_1, notes);
-        listView.setAdapter(noteRecyclerAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
-                //    NoteInfo note = (NoteInfo) listView.getItemAtPosition(position);
-                intent.putExtra(NOTE_POSITION, position);
-                startActivity(intent);
-            }
-        });*/
-        DataManager.loadFromDatabase(mDbOpenHelper);
-        recyclerView = findViewById(R.id.list_items);
-        linearLayoutManager = new LinearLayoutManager(this);
-        gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.course_grid_span));
-        List<CourseInfo> courses = DataManager.getInstance().getCourses();
-        coursesRecyclerAdapter = new CoursesRecyclerAdapter(this, courses);
-        noteRecyclerAdapter = new NoteRecyclerAdapter(this, null);
-        displayNotes();
-       /* displayCourses();*/
-
-    }
-
     private void displayCourses() {
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setAdapter(coursesRecyclerAdapter);
         selectNavigationMenuItem(R.id.nav_courses);
     }
 
-    private void displayNotes() {
-
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(noteRecyclerAdapter);
-
-
-        selectNavigationMenuItem(R.id.nav_notes);
-
-    }
-
-    private void selectNavigationMenuItem(int nav_notes) {
-        Menu menu = navigationView.getMenu();
-        menu.findItem(nav_notes).setChecked(true);
-    }
-
-
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;
         if (id == LOADER_NOTES) {
-            loader = new CursorLoader(this) {
-                @Override
-                public Cursor loadInBackground() {
-                    SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
                     final String[] noteColumns = {
-                            NoteInfoEntry.getQName(NoteInfoEntry._ID),
-                            NoteInfoEntry.COLUMN_NOTE_TITLE,
-                            CourseInfoEntry.COLUMN_COURSE_TITLE
+                            Notes._ID,
+                            Notes.COLUMN_NOTE_TITLE,
+                            Notes.COLUMN_COURSE_TITLE
 
                     };
-                    final String noteOrderBy = CourseInfoEntry.COLUMN_COURSE_TITLE +
+            final String noteOrderBy = Courses.COLUMN_COURSE_TITLE +
                             ", " + NoteInfoEntry.COLUMN_NOTE_TITLE;
 
-                    String tablesWithJoin = NoteInfoEntry.TABLE_NAME + " JOIN " +
-                            CourseInfoEntry.TABLE_NAME + " ON " +
-                            NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID) + " = " +
-                            CourseInfoEntry.getQName(CourseInfoEntry.COLUMN_COURSE_ID);
-                    return db.query(tablesWithJoin, noteColumns,
-                            null, null, null, null, noteOrderBy);
+            loader = new CursorLoader(this, Notes.CONTENT_EXPANDED_URI, noteColumns, null, null, noteOrderBy);
+
+
                 }
-            };
-        }
+
+
         return loader;
     }
 

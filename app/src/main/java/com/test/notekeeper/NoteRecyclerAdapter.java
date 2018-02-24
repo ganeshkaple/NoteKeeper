@@ -84,13 +84,10 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
             mTextCourse = itemView.findViewById(R.id.text_tiitle);
             mTextTitle = itemView.findViewById(R.id.text_view_text);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, NoteActivity.class);
-                    intent.putExtra(NoteActivity.NOTE_ID, mId);
-                    mContext.startActivity(intent);
-                }
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(mContext, NoteActivity.class);
+                intent.putExtra(NoteActivity.NOTE_ID, mId);
+                mContext.startActivity(intent);
             });
         }
     }
