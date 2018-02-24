@@ -16,7 +16,7 @@
         <activity
             android:name=".NoteListActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainActivity" />
         <activity
             android:name=".NavActivity"
@@ -36,6 +36,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.test.notekeeper.NavActivity" />
         </activity>
+
+        <provider
+            android:name=".NoteKeeperProvider"
+            android:authorities="com.test.notekeeper.provider"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>
