@@ -106,6 +106,7 @@ public class NavActivity extends AppCompatActivity
         linearLayoutManager = new LinearLayoutManager(this);
         gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.course_grid_span));
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
+        List<NoteInfo> notes = DataManager.getInstance().getNotes();
         coursesRecyclerAdapter = new CoursesRecyclerAdapter(this, courses);
         noteRecyclerAdapter = new NoteRecyclerAdapter(this, null);
         displayNotes();
